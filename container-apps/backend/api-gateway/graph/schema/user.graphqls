@@ -1,0 +1,25 @@
+type User {
+  id: ID!
+  email: String!
+  fullName: String!
+}
+
+input CreateUserInput {
+  fullName: String!
+  email: String!
+}
+
+input UpdateUserInput {
+  fullName: String!
+}
+
+extend type FederatedQuery {
+  listUsers: [User!]!
+  getUser(email: String!): User!
+}
+
+extend type FederatedMutation {
+  createUser(input: CreateUserInput!): String!
+  updateUser(input: UpdateUserInput!): User!
+  deleteUser(input: String!): String!
+}

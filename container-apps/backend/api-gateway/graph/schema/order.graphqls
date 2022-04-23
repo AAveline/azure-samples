@@ -1,0 +1,18 @@
+type Order {
+  id: ID!
+  userId: String!
+  productId: String!
+}
+
+input CreateOrderInput {
+  productId: String!
+  userId: String!
+}
+
+extend type FederatedQuery {
+  getOrders(userId: String!): [Order!]
+}
+
+extend type FederatedMutation {
+  createOrder(input: CreateOrderInput): String!
+}

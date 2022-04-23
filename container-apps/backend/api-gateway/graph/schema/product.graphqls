@@ -1,0 +1,24 @@
+type Product {
+  id: ID!
+  name: String!
+}
+
+input CreateProductInput {
+  name: String!
+}
+
+input UpdateProductInput {
+  id: ID!
+  name: String!
+}
+
+extend type FederatedQuery {
+  listProducts: [Product!]!
+  getProduct(id: String!): Product!
+}
+
+extend type FederatedMutation {
+  createProduct(input: CreateProductInput!): String!
+  updateProduct(input: UpdateProductInput!): Product!
+  deleteProduct(input: String): String!
+}

@@ -1,0 +1,16 @@
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+schema {
+  query: FederatedQuery
+  mutation: FederatedMutation
+}
+
+type FederatedQuery {
+  default: Boolean
+}
+
+type FederatedMutation {
+  default(ok: Boolean): Boolean
+}

@@ -1,0 +1,123 @@
+version: "3.9"
+services:
+  # API Gateway
+  api_gateway:
+    depends_on:
+      - placement
+    ports:
+      - 3000:3005
+      - 50001:50001
+    build:
+      dockerfile: Dockerfile
+      context: ./api-gateway
+      target: dev
+    volumes:
+      - ./api-gateway:/usr/src/app
+    networks:
+      - dapr-network
+  api_gateway_dapr:
+    image: "daprio/daprd:edge"
+    command: [
+      "./daprd",
+     "-app-id", "api-gateway",
+     "-app-port", "3005",
+     "-placement-host-address", "placement:50006",
+     "air"
+     ]
+    volumes:
+        - "./components/:/components" # Mount our components folder for the runtime to use
+    depends_on:
+      - api_gateway
+    network_mode: "service:api_gateway" 
+
+  # Product Service
+  product_service:
+    depends_on:
+      - placement
+    build:
+      dockerfile: Dockerfile
+      context: ./product-service
+      target: dev
+    volumes:
+      - ./product-service:/usr/src/app
+    networks:
+      - dapr-network
+  product_service_dapr:
+    image: "daprio/daprd:edge"
+    command: [
+      "./daprd",
+     "-app-id", "product-service",
+      "-app-port", "3000",
+     "-placement-host-address", "placement:50006",
+     "air"
+     ]
+    volumes:
+        - "./components/:/components" # Mount our components folder for the runtime to use
+    depends_on:
+      - product_service
+    network_mode: "service:product_service"
+  # Order Service
+  order_service:
+    depends_on:
+      - placement
+    build:
+      dockerfile: Dockerfile
+      context: ./order-service
+      target: dev
+    volumes:
+      - ./order-service:/usr/src/app
+    networks:
+      - dapr-network
+  order_service_dapr:
+    image: "daprio/daprd:edge"
+    command: [
+      "./daprd",
+     "-app-id", "order-service",
+      "-app-port", "3001",
+     "-placement-host-address", "placement:50006",
+     "air"
+     ]
+    volumes:
+        - "./components/:/components" # Mount our components folder for the runtime to use
+    depends_on:
+      - order_service
+    network_mode: "service:order_service"
+
+  # User Service
+  user_service:
+    depends_on:
+      - placement
+    build:
+      dockerfile: Dockerfile
+      context: ./user-service
+      target: dev
+    volumes:
+      - ./user-service:/usr/src/app
+    networks:
+      - dapr-network
+  user_service_dapr:
+    image: "daprio/daprd:edge"
+    command: [
+      "./daprd",
+      "-app-id", "user-service",
+      "-app-port", "3002",
+     "-placement-host-address", "placement:50006",
+     "air"
+     ]
+    volumes:
+        - "./components/:/components" # Mount our components folder for the runtime to use
+    depends_on:
+      - user_service
+    network_mode: "service:user_service"
+
+  # DAPR placement service
+  placement:
+    image: "daprio/dapr"
+    command: ["./placement", "-port", "50006"]
+    ports:
+      - "50006:50006"
+    networks:
+      - dapr-network
+
+networks:
+  dapr-network:
